@@ -1,0 +1,273 @@
+
+<div class="container-fluid mt-1">
+
+  <div class="row g-2">
+
+    <!-- ================= EMPLOYEE PORTAL ================= -->
+
+    <div [class]="isSidePanelOpen() ? 'col-7': 'col-12' ">
+
+      <div class="card">
+
+        <!-- Header -->
+        <div
+          class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"
+        >
+          <strong>Employee Portal</strong>
+
+          <button class="btn btn-warning" (click)="addNew()">
+            Add New
+          </button>
+        </div>
+
+        <!-- Employee Table -->
+
+          <div class="card-body p-3">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover mb-0">
+
+                <thead>
+                  <tr>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Contact No</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Role</th>
+                    <th>Gender</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @for (item of employeeList; track $index) {
+                    <tr>
+                      <td>{{ item.employeeId }}</td>
+                      <td>{{ item.employeeName }}</td>
+                      <td>{{ item.contactNo }}</td>
+                      <td>{{ item.emailId }}</td>
+                      <td>{{ item.deptId }}</td>
+                      <td>{{ item.role || '-' }}</td>
+                      <td>{{ item.gender || '-' }}</td>
+                      <td>
+                         <button type="button" class="btn btn-sm btn-success" (click)="onEdit(item)">
+                          Edit
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" (click)="onDelete(item.employeeId)">
+                          Delete
+                        </button>
+                      </td>
+                  
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="8" class="text-center">
+                        No employee records found.
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+
+
+      </div>
+
+    </div>
+
+    @if(isSidePanelOpen()){
+        <div class="col-md-5">
+
+      <div class="card">
+
+        <!-- Header -->
+        <div
+          class="card-header bg-secondary text-white d-flex justify-content-between align-items-center"
+        >
+
+          <strong>New Employee</strong>
+
+          <button class="btn btn-primary" (click)="close()">
+            Close
+          </button>
+
+        </div>
+
+
+        <!-- Form -->
+        <div class="card-body">
+
+          <div class="row g-2">
+
+            <!-- Employee Name -->
+            <div class="col-6">
+
+              <label class="form-label mb-1">
+                Employee Name
+              </label>
+
+              <input
+                type="text" name="employeeName"
+                class="form-control" [(ngModel)]="employeeObj.employeeName"
+                placeholder="Enter employee name"
+              >
+
+            </div>
+
+
+            <!-- Contact No -->
+            <div class="col-6">
+
+              <label class="form-label mb-1">
+                Contact No
+              </label>
+
+              <input
+                type="text" name="contactNo"
+                class="form-control" [(ngModel)]="employeeObj.contactNo"
+                placeholder="Enter contact number"
+              >
+
+            </div>
+
+
+            <!-- Email -->
+            <div class="col-6">
+
+              <label class="form-label mb-1">
+                Email
+              </label>
+
+              <input
+                type="email" name="emailId"
+                class="form-control" [(ngModel)]="employeeObj.emailId"
+                placeholder="Enter email"
+              >
+
+            </div>
+
+            <div class="col-6"></div>
+
+                <!-- Parent Department -->
+                  <div class="col-6">
+                    <label class="form-label mb-1">
+                      Parent Department
+                    </label>
+
+                    <select
+                      [(ngModel)]="deptId"
+                      name="deptId"
+                      class="form-select"
+                      (change)="onDeptChange()"
+                    >
+                      <option [ngValue]="0">
+                        Select Parent Department
+                      </option>
+
+                      @for (item of parentDeptList; track item.departmentId) {
+                        <option [ngValue]="item.departmentId">
+                          {{ item.departmentName }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+
+
+            <!-- Child Department -->
+           <!-- Child Department -->
+                <div class="col-6">
+                  <label class="form-label mb-1">
+                    Child Department
+                  </label>
+
+                  <select
+                    class="form-select"
+                    name="childDeptId"
+                    [(ngModel)]="employeeObj.deptId"
+                  >
+                    <option [ngValue]="0">
+                      Select Child Department
+                    </option>
+
+                    @for (item of childDeptList; track item.childDeptId) {
+                      <option [ngValue]="item.childDeptId">
+                        {{ item.departmentName }}
+                      </option>
+                    }
+                  </select>
+                </div>
+
+
+            <!-- Password -->
+            <div class="col-6">
+
+              <label class="form-label mb-1">
+                Password
+              </label>
+
+              <input
+                type="password" name="Password"
+                class="form-control" [(ngModel)]="employeeObj.password"
+                placeholder="Enter password"
+              >
+
+            </div>
+
+
+            <div class="col-6"></div>
+
+
+            <!-- Gender -->
+            <div class="col-8">
+
+              <label class="form-label mb-1">
+                Gender
+              </label>
+              <input type="radio" value="male" name="gender" [(ngModel)]="employeeObj.gender" />Male
+              <input type="radio"  value="female" name="gender" [(ngModel)]="employeeObj.gender" />Female
+               
+                 
+
+            </div>
+
+          </div>
+
+
+          <!-- Submit -->
+          
+           
+              <div>
+                <button
+                  *ngIf="employeeObj.employeeId == 0"
+                  class="btn btn-warning mt-3"
+                  type="button"
+                  (click)="onSaveEmp()">
+                  Submit
+                </button>
+
+                <button
+                  *ngIf="employeeObj.employeeId != 0"
+                  class="btn btn-primary mt-3"
+                  type="button"
+                  (click)="onUpdateEmp()">
+                  Update
+                </button>
+              </div>
+
+
+
+        </div>
+
+      </div>
+
+    </div>
+    }
+    <!-- ================= NEW EMPLOYEE ================= -->
+
+   
+
+  </div>
+
+</div>

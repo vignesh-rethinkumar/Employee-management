@@ -1,0 +1,198 @@
+<div class="row">
+  <div class="col-12" *ngIf="currentView ==='List' ">
+      <div class="card">
+        <div class="card-header bg-primary">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+          <strong>Project List </strong>
+
+         <button class="btn btn-success" (click)="initializeForm()">
+          Add New Employee
+        </button>
+
+        </div>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Project ID</th>
+                <th>Project Name</th>
+                <th>Client Name</th>
+                <th>Start Date</th>
+                <th>Lead By Employee</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+               <tr *ngFor="let project of projectList; let sr=index">
+                <td>{{sr+1}}</td>
+                <td>{{project.projectName}}</td>
+                <td>{{project.clientName}}</td>
+                <td>{{project.startDate | date:'dd-MMMM-yy'}}</td>
+                <td>{{project.employeeName}}</td>
+                <td>
+                    <button class="btn btn-primary" (click)="onEdit(project)">Edit</button>
+                  <button class="btn btn-success mx-2" (click)="onAddEmployees(project.projectId)">Employees</button>
+                </td>
+               </tr>
+            </tbody>
+
+          </table>
+        </div>
+      </div>
+  </div>
+  <div class="col-12" *ngIf="currentView !=='List' ">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+              <div class="col-6 text-white">
+
+                 <strong>New Project </strong>
+              </div>
+              <div class="col-6 text-end" >
+                <button class="btn btn-primary" (click)="currentView='List'">
+                 Close
+               </button>
+               </div>
+           </div>
+        
+        </div>
+        <div class="card-body">
+           
+            <form [formGroup]="projectForm" (ngSubmit)="onSaveProject()">
+                <div class="row">
+
+                  <!-- Row 1 -->
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" formControlName="projectName" class="form-control" placeholder="Enter project name">
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label">Client Name</label>
+                    <input type="text" formControlName="clientName"  class="form-control" placeholder="Enter client name">
+                  </div>
+
+                  <!-- Row 2 -->
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" formControlName="startDate"  class="form-control">
+                  </div>
+                
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label">Lead By Employee ID</label>
+
+                    <select class="form-select" formControlName="leadByEmpId">
+                      <option value="">Select Employee</option>
+
+                      <option
+                        *ngFor="let emp of (employeeData$ | async) ?? []"
+                        [value]="emp.employeeId">
+                        {{ emp.employeeName }}
+                      </option>
+                    </select>
+                  </div>
+
+
+                  <!-- Row 3 -->
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label">Contact Person</label>
+                    <input type="text" formControlName="contactPerson"  class="form-control" placeholder="Enter contact person name">
+                  </div>
+                  <div class="col-md-6 mb-2">
+                    <label class="form-label">Contact No</label>
+                    <input type="text" formControlName="contactNo"  class="form-control" placeholder="Enter contact number">
+                  </div>
+                    <div class="col-md-6 mb-2">
+                    <label class="form-label">EmailId</label>
+                    <input type="text" formControlName="emailId"  class="form-control" placeholder="Enter contact number">
+                  </div>
+
+                </div>
+
+              <!-- Submit button -->
+                <button type="submit" class="btn btn-primary mt-2">Submit</button>
+           </form> 
+
+         </div>
+  </div>
+</div>
+
+
+<button type="button" class="btn btn-info btn-lg" (click)="onAddEmployees(0)">
+  Open Modal
+</button>
+
+
+<div #myModal class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" (click)="closeModal()">&times;</button>
+        <h4 class="modal-title">Project Employees</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-3">
+            <select name="" id="" class="form-select" [(ngModel)]="projectEmployee.empId">
+               <option value="0">Select Employee</option>
+                <option *ngFor="let emp of employeeData$ | async" [value]="emp.employeeId">{{emp.employeeName}}</option>
+            </select>
+          </div>
+          <div class="col-3">
+            <input type="text" placeholder="Role" class="form-control" [(ngModel)]="projectEmployee.role" >
+            
+          </div>
+          <div class="col-3">
+            <input type="date" class="form-control " [(ngModel)]="projectEmployee.assignedDate">
+          </div>
+          <div class="col-3">
+            <input type="button" value="Add" class="btn btn-sm btn-primary" (click)="onAddEmp()">
+          </div>
+        </div>
+        <div class="row pt-3">
+          <div class="col-12">
+             <table class="table table-bordered">
+            <thead>
+              <tr>
+                
+                <th>Project Name</th>
+                <th>Employee Name</th>
+                <th>Status</th>
+                <th>Role</th>
+                <th>Assigned Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="projectEmployeeList.length == 0">
+                <tr>
+                  <td colspan="5" class="text-center">
+                    <p>No Employee Added Yet</p>
+                  </td>
+                </tr>
+              </ng-container>
+               <ng-container *ngIf="projectEmployeeList.length !== 0">
+                    <tr *ngFor="let emp of projectEmployeeList">
+                        <td>{{emp.projectName}}</td>
+                        <td>{{emp.employeeName}}</td>
+                        <td>{{emp.isActive}}</td>
+                        <td>{{emp.role}}</td>
+                        <td>{{emp.assignedDate | date:'dd-MM-yyyy'}}</td>
+
+                    </tr>
+               </ng-container>
+               
+            </tbody>
+
+          </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
